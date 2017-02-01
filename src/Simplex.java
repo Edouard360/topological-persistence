@@ -4,8 +4,8 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 public class Simplex {
-	float val;
-	int dim;
+	public float val;
+	public int dim;
 	TreeSet<Integer> vert;
 	
 	public int order;

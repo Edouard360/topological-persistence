@@ -31,7 +31,20 @@ public class Filtration {
 		}
 		return s;
 	}
-		
+	public String getIntervals(TreeSet<Interval> t){
+		String s ="";
+		for(Interval interval:t){
+			Simplex begin = F.get(interval.begin);
+			s+=Integer.toString(begin.dim)+" "+Float.toString(begin.val)+" ";
+			if(interval.end!= -1){
+				s+=Float.toString(F.get(interval.end).val)+" ";
+			}else{
+				s+="inf";
+			}
+			s+="\n";
+		} 
+		return s;
+	}
 	public void sort(){
 		Collections.sort(F, new Comparator<Simplex>() {
 			public int compare(Simplex si, Simplex sj) {
@@ -78,7 +91,4 @@ public class Filtration {
 		}
 		return sparseMatrix;
 	}
-	
-
-
 }

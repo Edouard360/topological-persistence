@@ -20,12 +20,6 @@ public class SparseRepresentation {
 		F.computeOrder();
 		
 		matrix = F.getSparseRepresentation();
-		
-		this.reduce();
-		
-		//System.out.println(F.toStringSimple());
-		System.out.println(this.toString());
-		
 	}
 	
 	public ArrayList<TreeSet<Integer>> transpose(){
@@ -44,7 +38,7 @@ public class SparseRepresentation {
 	
 	}
 	
-	public void reduce(){
+	public ArrayList<Integer> reduce(){
 		ArrayList<Integer> lowIndices = new ArrayList<Integer>();
 		int j = 0,lowerIndex=-1;
 		boolean loopAgain = true;
@@ -68,7 +62,10 @@ public class SparseRepresentation {
 			lowIndices.add(lowerIndex);
 			j++;
 		}
+		return(lowIndices);
 	}
+	
+
 	
 	public String toString(){
 		int size = matrix.size();
