@@ -48,7 +48,6 @@ public class SparseRepresentation {
 		HashMap<Integer, TreeSet<Integer>> lowMapToColumns = new HashMap<Integer, TreeSet<Integer>>();
 		int j = 0, lowerIndex = -1;
 
-		System.out.println(matrix.size());
 		for (TreeSet<Integer> listOrder : matrix) {
 			while (true) {
 				if (listOrder.size() == 0) {

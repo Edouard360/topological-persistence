@@ -5,126 +5,151 @@ import java.util.Locale;
 import java.util.Scanner;
 import java.util.TreeSet;
 import java.util.Vector;
-import java.util.regex.Pattern;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+/**
+ * The MainFiltration class. (originally the ReadFiltration class)
+ * 
+ * It has a static main function.
+ * 
+ * The filtration object has a getSparseRepresentation method, which creates the
+ * sparse matrix column by column, looking at the derivative of each simplex.
+ * 
+ */
+
 public class MainFiltration {
-	final static List<String> GENERATED_FILTRATIONS= Arrays.asList("klein-bottle.txt","mobius-strip.txt","projective-plane.txt","tore.txt","ball3.txt","sphere3.txt");
-	final static List<String> PROVIDED_FILTRATIONS= Arrays.asList("filtration_A.txt","filtration_B.txt","filtration_C.txt","filtration_D.txt");
+	final static List<String> GENERATED_FILTRATIONS = Arrays.asList("klein-bottle.txt", "mobius-strip.txt",
+			"projective-plane.txt", "tore.txt", "ball3.txt", "sphere4.txt", "ball4.txt");
+	final static List<String> PROVIDED_FILTRATIONS = Arrays.asList("filtration_A.txt", "filtration_B.txt",
+			"filtration_C.txt", "filtration_D.txt");
 	final static String GENERATED_FILTRATIONS_PATH = "/tests/generated-filtrations/";
 	final static String PROVIDED_FILTRATIONS_PATH = "/tests/provided-filtrations/";
-	
+
 	public static void main(String[] args) throws FileNotFoundException {
-		if (args.length != 1) {			
-			//createFiltrations();
-			printBarcodes();
-			//runTimeTest();
-			
+		if (args.length != 1) {
+			// createFiltrations();
+			printBarcodes(GENERATED_FILTRATIONS,GENERATED_FILTRATIONS_PATH);
+			// printBarcodes(PROVIDED_FILTRATIONS,PROVIDED_FILTRATIONS_PATH);
+
 			System.exit(0);
-		}	
+		}
 		System.out.println(readFiltration(args[0]));
 	}
+
+	static void printBarcodes(List<String> filtrationList, String filtrationPath) throws FileNotFoundException {
+		for (String s : filtrationList)
+			printBarcode(s, filtrationPath);
+	}
+
+	static void printBarcode(String filtrationName, String filtrationPath)
+			throws FileNotFoundException {
+		/*
+		 * The printBarcode static function.
+		 * 
+		 * Loads the filtration, computes its matrix representation, reduces it,
+		 * gets the corresponding lowestIndices array, deduces the intervals
+		 * from this array, and, finally outputs the result to a file of the same
+		 * name in the folder /results/barcodes/
+		 * 
+		 * Also computes statistics for the running time and output them in the
+		 * folder: /results/runtime/
+		 */
+		
+		System.out.println("Reading filtration at "+filtrationPath+filtrationName);
+
+		long startTime = System.currentTimeMillis();
+		Filtration F = new Filtration(
+				MainFiltration.readFiltration(System.getProperty("user.dir") + filtrationPath + filtrationName));
+		
+		System.out.println("Getting sparse representation");
+		SparseRepresentation M = new SparseRepresentation(F);
+		
+		System.out.println("Reducing the matrix");
+		ArrayList<Integer> lowestIndices = M.reduce();
+		
+		System.out.println("Identifying intervals");
+		TreeSet<Interval> intervals = Interval.toIntervals(lowestIndices);
+
+		PrintWriter out = new PrintWriter(
+				System.getProperty("user.dir") + filtrationPath + "results/barcodes/" + filtrationName);
+		System.out.println("Translating back intervals and printing out to "+filtrationPath+"results/barcodes/"+filtrationName);
+		F.printIntervalsToFile(intervals, out); // Translation operation is here.
+		out.close();
+
+		long endTime = System.currentTimeMillis();
+		long totalTime = endTime - startTime;
+		double fSize = (double) F.getSize();
+		System.out.println("Writting stats at "+filtrationPath+"results/runtime/"+filtrationName+"\n");
+		out = new PrintWriter(
+				System.getProperty("user.dir") + filtrationPath + "results/runtime/" + filtrationName);
+		out.print("Running time for " + filtrationName + ": " + Long.toString(totalTime) + " ms.\n\n"
+				+ "Filtration of size: " + Double.toString(fSize) + "\n\n" + "Time / (size^3) = "
+				+ Double.toString(totalTime / Math.pow(fSize, 3)) + " ms.");
+		out.close();
+	}
 	
-	static Vector<Simplex> readFiltration (String filename) throws FileNotFoundException {
+	static Vector<Simplex> readFiltration(String filename) throws FileNotFoundException {
+		/*
+		 * The original readFiltration function
+		 */
 		Vector<Simplex> F = new Vector<Simplex>();
 		Scanner sc = new Scanner(new File(filename));
 		sc.useLocale(Locale.US);
 		while (sc.hasNext())
 			F.add(new Simplex(sc));
 		sc.close();
-				
 		return F;
 	}
-	
-	static void printBarcodes() throws FileNotFoundException{
-		for(String s:GENERATED_FILTRATIONS)
-			printBarcode(s);	
-	}
-	
-	static void printBarcode(String filtrationName) throws FileNotFoundException{
-		printBarcode(filtrationName,GENERATED_FILTRATIONS_PATH,false,false);
-	}
-	
-	static void runTimeTest() throws FileNotFoundException{
-		for(String s:PROVIDED_FILTRATIONS)
-			printBarcode(s,PROVIDED_FILTRATIONS_PATH,false,true);	
-	}
-		
-	static void printBarcode(String filtrationName,String filtrationPath,boolean verbose,boolean runtime) throws FileNotFoundException{	
-		long startTime = System.currentTimeMillis();
-		Filtration F = new Filtration(MainFiltration.readFiltration(System.getProperty("user.dir")+filtrationPath+filtrationName));
-		double fSize = (double) F.get().size();
-		
-		// Creating the matrix representation 
-		SparseRepresentation M = new SparseRepresentation(F);
-		if(verbose){
-			System.out.println("Original matrix representation:\n");
-			System.out.println(M);
-		}
-		
-		// Reducing the matrix (and get the lowest indices for each simplex)
-		ArrayList<Integer> lowIndices = M.reduce();
-		if(verbose){
-			System.out.println("Matrix after reduction:\n");
-			System.out.println(M);
-		}
 
-		// From the lowest indices, create the intervals
-		TreeSet<Interval> intervals =  Interval.toIntervals(lowIndices);
-		
-		// Translate back the intervals using the filtration (which was indexed by the attribute order)
-		PrintWriter out = new PrintWriter(System.getProperty("user.dir")+filtrationPath+"results/barcodes/"+filtrationName);
-		F.printIntervalsToFile(intervals,out);
-		out.close();
-
-		if(verbose){
-			System.out.println("Barcode:\n");
-		}
-		
-		long endTime   = System.currentTimeMillis();
-		long totalTime = endTime - startTime;
-		
-		if(runtime){
-			out = new PrintWriter(System.getProperty("user.dir")+filtrationPath+"results/runtime/"+filtrationName);
-			out.print("Running time for "+filtrationName+": "+Long.toString(totalTime)+" ms.\n\n"
-		+"Filtration of size: "+Double.toString(fSize)+"\n\n"
-		+"Time / (size^3) = "+Double.toString(totalTime/Math.pow(fSize, 3))+" ms.");
-			out.close();
-		}
-		
-	}
-	
 	static void createFiltrations() throws FileNotFoundException {
-		for(String s:GENERATED_FILTRATIONS)
-			createFiltrationFromFile("simplices/"+s,s);
+		/*
+		 * The createFiltrations function, that calls createFiltrationFromFile
+		 * (see below) for each of the manually generated filtrations in
+		 * GENERATED_FILTRATIONS (see below for details)
+		 */
+		for (String s : GENERATED_FILTRATIONS)
+			createFiltrationFromFile("simplices/" + s, s);
 	}
-	
-	static void createFiltrationFromFile(String fromFilename,String toFilename) throws FileNotFoundException {
-		String dirf = System.getProperty("user.dir")+"/tests/generated-filtrations/";
+
+	static void createFiltrationFromFile(String fromFilename, String toFilename) throws FileNotFoundException {
+		/*
+		 * The following simplicial complex: klein-bottle, mobius-strip,
+		 * projective-place and tore have been manually generated, in the:
+		 * /tests/generated-filtrations/simplices/ folder.
+		 * 
+		 * To create the correponding filtrations in the folder:
+		 * /tests/generated-filtrations/ 
+		 * the function createFiltrationFromFile needs to be called.
+		 */
+		String filtrationDirectory = System.getProperty("user.dir") + GENERATED_FILTRATIONS_PATH;
 		Scanner sc = null;
-		try{
-			sc = new Scanner(new File(dirf+fromFilename));
-		}catch(FileNotFoundException e){
-			return;	
+		try {
+			sc = new Scanner(new File(filtrationDirectory + fromFilename));
+		} catch (FileNotFoundException e) {
+			// "sphere4.txt" and "ball4.txt" would launch a file not found
+			// exception since they are also generated filtrations, but don't
+			// appear in the:
+			// /tests/generated-filtrations/simplices/ folder.
+			// Indeed are computed from scratch with the GenerateFilration
+			// class.
+			return;
 		}
 		sc.useLocale(Locale.US);
-		String s = "",nextLine;
+		String s = "", nextLine;
 		float f = 1.0f;
-		while (sc.hasNext()){
-			nextLine = sc.nextLine();		
-			if(nextLine.startsWith("//")){
-				f+= 1.0f;
-			}else{
-				s += Float.toString(f)+" "+nextLine+"\n";
+		while (sc.hasNext()) {
+			nextLine = sc.nextLine();
+			if (nextLine.startsWith("//")) {
+				f += 1.0f;
+			} else {
+				s += Float.toString(f) + " " + nextLine + "\n";
 			}
 		}
 		sc.close();
-		
-		PrintWriter out = new PrintWriter(dirf+toFilename);
+
+		PrintWriter out = new PrintWriter(filtrationDirectory + toFilename);
 		out.println(s);
 		out.close();
 	}
