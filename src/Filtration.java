@@ -42,7 +42,8 @@ public class Filtration {
 				s+="inf";
 			}
 			s+="\n";
-		} 
+		}
+		s = s.substring(0, s.length()-2); // To remove the last "\n"
 		return s;
 	}
 	public void sort(){

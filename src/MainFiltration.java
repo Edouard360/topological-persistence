@@ -13,13 +13,18 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MainFiltration {
-	final static List<String> COMPUTED_FILTRATIONS= Arrays.asList("klein-bottle.txt","mobius-strip.txt","projective-plane.txt","tore.txt","ball3.txt","sphere3.txt");
-	final static String FILTRATION_PATH = "/tests/filtrations/";
+	final static List<String> GENERATED_FILTRATIONS= Arrays.asList("klein-bottle.txt","mobius-strip.txt","projective-plane.txt","tore.txt","ball3.txt","sphere3.txt");
+	final static List<String> PROVIDED_FILTRATIONS= Arrays.asList("filtration_A.txt","filtration_B.txt","filtration_C.txt","filtration_D.txt");
+	final static String GENERATED_FILTRATIONS_PATH = "/tests/generated-filtrations/";
+	final static String PROVIDED_FILTRATIONS_PATH = "/tests/provided-filtrations/";
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		if (args.length != 1) {			
 			//createFiltrations();
-			printBarcodes();
+			//printBarcodes();
+			//runTimeTest();
+			
+			printBarcode(PROVIDED_FILTRATIONS.get(0),PROVIDED_FILTRATIONS_PATH,false,true);
 			System.exit(0);
 		}
 			
@@ -30,8 +35,6 @@ public class MainFiltration {
 		Vector<Simplex> F = new Vector<Simplex>();
 		Scanner sc = new Scanner(new File(filename));
 		sc.useLocale(Locale.US);
-		sc.hasNext(Pattern.compile("//"));
-		sc.nextLine();
 		while (sc.hasNext())
 			F.add(new Simplex(sc));
 		sc.close();
@@ -40,17 +43,26 @@ public class MainFiltration {
 	}
 	
 	static void printBarcodes() throws FileNotFoundException{
-		for(String s:COMPUTED_FILTRATIONS)
+		for(String s:GENERATED_FILTRATIONS)
 			printBarcode(s);	
 	}
 	
 	static void printBarcode(String filtrationName) throws FileNotFoundException{
-		printBarcode(filtrationName,false);
+		printBarcode(filtrationName,GENERATED_FILTRATIONS_PATH,false,false);
+	}
+	
+	static void runTimeTest() throws FileNotFoundException{
+		for(String s:PROVIDED_FILTRATIONS)
+			printBarcode(s,PROVIDED_FILTRATIONS_PATH,false,true);	
 	}
 		
-	static void printBarcode(String filtrationName,boolean verbose) throws FileNotFoundException{
-		Filtration F = new Filtration(MainFiltration.readFiltration(System.getProperty("user.dir")+FILTRATION_PATH+filtrationName));
+	static void printBarcode(String filtrationName,String filtrationPath,boolean verbose,boolean runtime) throws FileNotFoundException{	
+		long startTime = System.currentTimeMillis();
+		System.out.println("READING FILTRATION");
+		Filtration F = new Filtration(MainFiltration.readFiltration(System.getProperty("user.dir")+filtrationPath+filtrationName));
+		double fSize = (double) F.get().size();
 		
+		System.out.println("CREATING REPRESENTATION");
 		// Creating the matrix representation 
 		SparseRepresentation M = new SparseRepresentation(F);
 		if(verbose){
@@ -58,6 +70,7 @@ public class MainFiltration {
 			System.out.println(M);
 		}
 		
+		System.out.println("REDUCING MATRIX");
 		// Reducing the matrix (and get the lowest indices for each simplex)
 		ArrayList<Integer> lowIndices = M.reduce();
 		if(verbose){
@@ -74,26 +87,29 @@ public class MainFiltration {
 			System.out.println("Barcode:\n");
 			System.out.println(result);
 		}
+		
+		long endTime   = System.currentTimeMillis();
+		long totalTime = endTime - startTime;
+		if(runtime){
+			result = "Running time for "+filtrationName+": "+Long.toString(totalTime)+" ms.\n\n"
+		+"Filtration of size: "+Double.toString(fSize)+"\n\n"
+		+"Time / (size^3) = "+Double.toString(totalTime/Math.pow(fSize, 3))+" ms.\n\n"+result;
+		}
 
-		PrintWriter out = new PrintWriter(System.getProperty("user.dir")+FILTRATION_PATH+"results/"+filtrationName);
-		out.println(result);
+		PrintWriter out = new PrintWriter(System.getProperty("user.dir")+filtrationPath+"results/"+filtrationName);
+		out.print(result);
 		out.close();	
 	}
 	
 	static void createFiltrations() throws FileNotFoundException {
-		for(String s:COMPUTED_FILTRATIONS)
+		for(String s:GENERATED_FILTRATIONS)
 			createFiltrationFromFile("simplices/"+s,s);
-	}
-	
-	static void createSphere(){
-		
 	}
 	
 	static void createFiltrationFromFile(String fromFilename,String toFilename) throws FileNotFoundException {
 		String dirf = System.getProperty("user.dir")+"/tests/filtrations/";
 		Scanner sc = new Scanner(new File(dirf+fromFilename));
 		sc.useLocale(Locale.US);
-		int i = 0;
 		String s = "",nextLine;
 		float f = 1.0f;
 		while (sc.hasNext()){
