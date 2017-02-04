@@ -28,11 +28,13 @@ public class GenerateFiltration {
 
 		String ballFiltration = generateBall(4);
 		String sphereFiltration = generateSphere(4);
-
+		
+		System.out.println("Writting the ball filtration at /tests/generated-filtrations/\n");
 		String filtrationDirectory = System.getProperty("user.dir") + "/tests/generated-filtrations/";
 		PrintWriter out = new PrintWriter(filtrationDirectory + "ball4.txt");
 		out.println(ballFiltration);
 		out.close();
+		System.out.println("Writting the sphere filtration at /tests/generated-filtrations/\n");
 		out = new PrintWriter(filtrationDirectory + "sphere4.txt");
 		out.println(sphereFiltration);
 		out.close();
