@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -16,6 +17,7 @@ public class SparseRepresentation {
 		
 		// Sorting the filtration F
 		F.sort();
+		
 		// Set the order of each simplex in the filtration
 		F.computeOrder();
 		
@@ -40,33 +42,34 @@ public class SparseRepresentation {
 	
 	public ArrayList<Integer> reduce(){
 		ArrayList<Integer> lowIndices = new ArrayList<Integer>();
+		HashMap<Integer,TreeSet<Integer>> lowMapToColumns= new HashMap<Integer,TreeSet<Integer>>();
 		int j = 0,lowerIndex=-1;
-		boolean loopAgain = true;
+
+		System.out.println(matrix.size());
 		for(TreeSet<Integer> listOrder: matrix){
-			loopAgain = true;
-			while(loopAgain==true){
-				loopAgain=false;
+			while(true){
 				if(listOrder.size()==0){
 					lowerIndex = -1;
 					break;
 				}
 				lowerIndex = listOrder.last();
-				for(int k = 0;k<=j-1;k++){
-					if(lowIndices.get(k)==lowerIndex){
-						SparseOperation.substract(listOrder, matrix.get(k));
-						loopAgain=true;
-						break;
-					}
-				}	
+				TreeSet<Integer> toSubstract = lowMapToColumns.get(lowerIndex);
+				if(toSubstract != null){
+					SparseOperation.substract(listOrder, toSubstract);
+				}else{
+					break;
+				}
 			}
 			lowIndices.add(lowerIndex);
+			if(lowerIndex!=-1){
+				lowMapToColumns.put(lowerIndex, matrix.get(j));
+			}
+			
 			j++;
 		}
 		return(lowIndices);
 	}
-	
-
-	
+		
 	public String toString(){
 		int size = matrix.size();
 		String s = "   ";
@@ -91,7 +94,4 @@ public class SparseRepresentation {
 		
 		return s;
 	 }
-	
-	
-
 }

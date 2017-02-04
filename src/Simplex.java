@@ -6,9 +6,8 @@ import java.util.Vector;
 public class Simplex {
 	public float val;
 	public int dim;
-	TreeSet<Integer> vert;
-	
 	public int order;
+	TreeSet<Integer> vert;
 
 	Simplex(Scanner sc){
 		val = sc.nextFloat();
@@ -33,6 +32,10 @@ public class Simplex {
 	}
 	public String toStringSimple(){
 		return "\u03C3"+order+" => "+vert+"\n";
+	}
+	
+	public TreeSet<Integer> getTreeSet(){
+		return this.vert;
 	}
 
 	public void updateVal(float val){

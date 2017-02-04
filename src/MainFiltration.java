@@ -21,13 +21,11 @@ public class MainFiltration {
 	public static void main(String[] args) throws FileNotFoundException {
 		if (args.length != 1) {			
 			//createFiltrations();
-			//printBarcodes();
+			printBarcodes();
 			//runTimeTest();
 			
-			printBarcode(PROVIDED_FILTRATIONS.get(0),PROVIDED_FILTRATIONS_PATH,false,true);
 			System.exit(0);
-		}
-			
+		}	
 		System.out.println(readFiltration(args[0]));
 	}
 	
@@ -58,11 +56,9 @@ public class MainFiltration {
 		
 	static void printBarcode(String filtrationName,String filtrationPath,boolean verbose,boolean runtime) throws FileNotFoundException{	
 		long startTime = System.currentTimeMillis();
-		System.out.println("READING FILTRATION");
 		Filtration F = new Filtration(MainFiltration.readFiltration(System.getProperty("user.dir")+filtrationPath+filtrationName));
 		double fSize = (double) F.get().size();
 		
-		System.out.println("CREATING REPRESENTATION");
 		// Creating the matrix representation 
 		SparseRepresentation M = new SparseRepresentation(F);
 		if(verbose){
@@ -70,7 +66,6 @@ public class MainFiltration {
 			System.out.println(M);
 		}
 		
-		System.out.println("REDUCING MATRIX");
 		// Reducing the matrix (and get the lowest indices for each simplex)
 		ArrayList<Integer> lowIndices = M.reduce();
 		if(verbose){
@@ -82,23 +77,25 @@ public class MainFiltration {
 		TreeSet<Interval> intervals =  Interval.toIntervals(lowIndices);
 		
 		// Translate back the intervals using the filtration (which was indexed by the attribute order)
-		String result = F.getIntervals(intervals);
+		PrintWriter out = new PrintWriter(System.getProperty("user.dir")+filtrationPath+"results/barcodes/"+filtrationName);
+		F.printIntervalsToFile(intervals,out);
+		out.close();
+
 		if(verbose){
 			System.out.println("Barcode:\n");
-			System.out.println(result);
 		}
 		
 		long endTime   = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
+		
 		if(runtime){
-			result = "Running time for "+filtrationName+": "+Long.toString(totalTime)+" ms.\n\n"
+			out = new PrintWriter(System.getProperty("user.dir")+filtrationPath+"results/runtime/"+filtrationName);
+			out.print("Running time for "+filtrationName+": "+Long.toString(totalTime)+" ms.\n\n"
 		+"Filtration of size: "+Double.toString(fSize)+"\n\n"
-		+"Time / (size^3) = "+Double.toString(totalTime/Math.pow(fSize, 3))+" ms.\n\n"+result;
+		+"Time / (size^3) = "+Double.toString(totalTime/Math.pow(fSize, 3))+" ms.");
+			out.close();
 		}
-
-		PrintWriter out = new PrintWriter(System.getProperty("user.dir")+filtrationPath+"results/"+filtrationName);
-		out.print(result);
-		out.close();	
+		
 	}
 	
 	static void createFiltrations() throws FileNotFoundException {
@@ -107,8 +104,13 @@ public class MainFiltration {
 	}
 	
 	static void createFiltrationFromFile(String fromFilename,String toFilename) throws FileNotFoundException {
-		String dirf = System.getProperty("user.dir")+"/tests/filtrations/";
-		Scanner sc = new Scanner(new File(dirf+fromFilename));
+		String dirf = System.getProperty("user.dir")+"/tests/generated-filtrations/";
+		Scanner sc = null;
+		try{
+			sc = new Scanner(new File(dirf+fromFilename));
+		}catch(FileNotFoundException e){
+			return;	
+		}
 		sc.useLocale(Locale.US);
 		String s = "",nextLine;
 		float f = 1.0f;
