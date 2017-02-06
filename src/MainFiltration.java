@@ -8,7 +8,6 @@ import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 /**
  * The MainFiltration class. (originally the ReadFiltration class)
  * 
@@ -21,7 +20,7 @@ import java.util.List;
 
 public class MainFiltration {
 	final static List<String> GENERATED_FILTRATIONS = Arrays.asList("klein-bottle.txt", "mobius-strip.txt",
-			"projective-plane.txt", "tore.txt", "sphere4.txt", "ball4.txt");
+			"projective-plane.txt", "torus.txt", "sphere4.txt", "ball4.txt");
 	final static List<String> PROVIDED_FILTRATIONS = Arrays.asList("filtration_A.txt", "filtration_B.txt",
 			"filtration_C.txt", "filtration_D.txt");
 	final static String GENERATED_FILTRATIONS_PATH = "/tests/generated-filtrations/";
@@ -31,18 +30,18 @@ public class MainFiltration {
 		if (args.length != 1) {
 
 			// First uncomment and run this to create the filtrations.
-			// createFiltrations();
+			//createFiltrations();
 
 			// Then go in the GenerateFiltration.java and run the main to
 			// generate the sphere and the ball.
 
 			// Now that generated filtrations are ready, uncomment and run:
-			// printBarcodes(GENERATED_FILTRATIONS,GENERATED_FILTRATIONS_PATH);
+			//printBarcodes(GENERATED_FILTRATIONS,GENERATED_FILTRATIONS_PATH);
 
 			// Now for the provided filtrations (make sure to put them in the
 			// folder corresponding to PROVIDED_FILTRATIONS_PATH), uncomment and
 			// run:
-			// printBarcodes(PROVIDED_FILTRATIONS,PROVIDED_FILTRATIONS_PATH);
+			printBarcodes(PROVIDED_FILTRATIONS,PROVIDED_FILTRATIONS_PATH);
 
 			System.exit(0);
 		}
@@ -50,11 +49,13 @@ public class MainFiltration {
 	}
 
 	static void printBarcodes(List<String> filtrationList, String filtrationPath) throws FileNotFoundException {
+		PrintWriter commonOutput = new PrintWriter(System.getProperty("user.dir") + filtrationPath + "results/runtime/all_stats.txt");
 		for (String s : filtrationList)
-			printBarcode(s, filtrationPath);
+			printBarcode(s, filtrationPath,commonOutput);
+		commonOutput.close();
 	}
 
-	static void printBarcode(String filtrationName, String filtrationPath) throws FileNotFoundException {
+	static void printBarcode(String filtrationName, String filtrationPath, PrintWriter commonOutput) throws FileNotFoundException {
 		/*
 		 * The printBarcode static function.
 		 * 
@@ -65,40 +66,49 @@ public class MainFiltration {
 		 * 
 		 * Also computes statistics for the running time and output them in the
 		 * folder: /results/runtime/
+		 * 
+		 * commonOutput is where the stats for all the filtration will be written, so as to compare them and analyse the complexity of our algorithms.
 		 */
 
 		System.out.println("Reading filtration at " + filtrationPath + filtrationName);
-
-		long startTime = System.currentTimeMillis();
+		
+		long[] timeStamps = new long[6]; // Regular timestamps for accurate stats.  
+		timeStamps[0] = System.currentTimeMillis();
 		Filtration F = new Filtration(
 				MainFiltration.readFiltration(System.getProperty("user.dir") + filtrationPath + filtrationName));
-
+		
+		timeStamps[1] = System.currentTimeMillis();
 		System.out.println("Getting sparse representation");
 		SparseRepresentation M = new SparseRepresentation(F);
-
+		
+		timeStamps[2] = System.currentTimeMillis();
 		System.out.println("Reducing the matrix");
 		ArrayList<Integer> lowestIndices = M.reduce();
 
+		timeStamps[3] = System.currentTimeMillis();
 		System.out.println("Identifying intervals");
 		TreeSet<Interval> intervals = Interval.toIntervals(lowestIndices);
 
+		
 		PrintWriter out = new PrintWriter(
 				System.getProperty("user.dir") + filtrationPath + "results/barcodes/" + filtrationName);
+		timeStamps[4] = System.currentTimeMillis();
 		System.out.println("Translating back intervals and printing out to " + filtrationPath + "results/barcodes/"
 				+ filtrationName);
 		F.printIntervalsToFile(intervals, out); // Translation operation is
 												// here.
 		out.close();
 
-		long endTime = System.currentTimeMillis();
-		long totalTime = endTime - startTime;
-		double fSize = (double) F.getSize();
+		timeStamps[5] = System.currentTimeMillis();
+
+		
+		
 		System.out.println("Writting stats at " + filtrationPath + "results/runtime/" + filtrationName + "\n");
-		out = new PrintWriter(System.getProperty("user.dir") + filtrationPath + "results/runtime/" + filtrationName);
-		out.print("Running time for " + filtrationName + ": " + Long.toString(totalTime) + " ms.\n\n"
-				+ "Filtration of size: " + Double.toString(fSize) + "\n\n" + "Time / (size^3) = "
-				+ Double.toString(totalTime / Math.pow(fSize, 3)) + " ms.");
-		out.close();
+		PrintWriter detailedOutput = new PrintWriter(System.getProperty("user.dir") + filtrationPath + "results/runtime/" + filtrationName);
+		
+		double filtrationSize = (double) F.getSize();
+		Stats.printStats(detailedOutput,commonOutput,filtrationName,filtrationSize,timeStamps);
+		detailedOutput.close();
 	}
 
 	static Vector<Simplex> readFiltration(String filename) throws FileNotFoundException {
