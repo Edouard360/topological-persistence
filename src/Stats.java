@@ -57,8 +57,9 @@ public class Stats {
 		detailedOutput.print(title + header + "Full Algorithm\t\t\t" + total + "Reading/Sorting\t\t\t" + readSort
 				+ "Sparse Representation\t" + sparseRep + "Reducing Matrix\t\t\t" + reduce + "Identifying intervals\t"
 				+ identification + "Outputing Result\t\t" + output);
-
-		commonOutput.println(title + header + "Sparse Representation\t" + sparseRep + "Reducing Matrix\t\t\t" + reduce);
+		
+		if(commonOutput!=null)
+			commonOutput.println(title + header + "Sparse Representation\t" + sparseRep + "Reducing Matrix\t\t\t" + reduce);
 	}
 
 }

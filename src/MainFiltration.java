@@ -41,7 +41,11 @@ public class MainFiltration {
 			// Now for the provided filtrations (make sure to put them in the
 			// folder corresponding to PROVIDED_FILTRATIONS_PATH), uncomment and
 			// run:
-			printBarcodes(PROVIDED_FILTRATIONS,PROVIDED_FILTRATIONS_PATH);
+			//printBarcodes(PROVIDED_FILTRATIONS,PROVIDED_FILTRATIONS_PATH);
+			
+			// If you want to test a single filtration, run:
+			// printBarcode("klein-bottle.txt",GENERATED_FILTRATIONS_PATH,null);
+			
 
 			System.exit(0);
 		}
@@ -101,8 +105,6 @@ public class MainFiltration {
 
 		timeStamps[5] = System.currentTimeMillis();
 
-		
-		
 		System.out.println("Writting stats at " + filtrationPath + "results/runtime/" + filtrationName + "\n");
 		PrintWriter detailedOutput = new PrintWriter(System.getProperty("user.dir") + filtrationPath + "results/runtime/" + filtrationName);
 		
