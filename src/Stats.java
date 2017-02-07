@@ -28,7 +28,7 @@ class Statistic {
 	}
 
 	public String toString() {
-		return formatter.format(time) + "\t\t\t" + formatter.format(average) + "\t\t\t" + formatter.format(n2) + "\t\t"
+		return formatter.format(time) + "\t\t" + formatter.format(average) + "\t\t" + formatter.format(n2) + "\t\t"
 				+ formatter.format(n3) + "\n";
 	}
 }
@@ -53,13 +53,13 @@ public class Stats {
 		Statistic output = new Statistic(timeStamps[5] - timeStamps[4], filtrationSize);
 
 		String title = "Statistics for " + filtrationName + " of size " + Integer.toString((int)filtrationSize) + "\n";
-		String header = "\t\t\t\t\t\tTime (ms)\t\tAverage (ms)\tT/(n^2)\t\tT/(n^3)\n";
-		detailedOutput.print(title + header + "Full Algorithm\t\t\t" + total + "Reading/Sorting\t\t\t" + readSort
-				+ "Sparse Representation\t" + sparseRep + "Reducing Matrix\t\t\t" + reduce + "Identifying intervals\t"
-				+ identification + "Outputing Result\t\t" + output);
+		String header = "\t\t\tTime (ms)\tAverage (ms)\tT/(n^2)\t\tT/(n^3)\n";
+		detailedOutput.print(title + header + "Full Algorithm\t\t" + total + "Reading/Sorting\t\t" + readSort
+				+ "Sparse Representation\t" + sparseRep + "Reducing Matrix\t\t" + reduce + "Identifying intervals\t"
+				+ identification + "Outputing Result\t" + output);
 		
 		if(commonOutput!=null)
-			commonOutput.println(title + header + "Sparse Representation\t" + sparseRep + "Reducing Matrix\t\t\t" + reduce);
+			commonOutput.println(title + header + "Sparse Representation\t" + sparseRep + "Reducing Matrix\t\t" + reduce);
 	}
 
 }

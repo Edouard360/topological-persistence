@@ -1,0 +1,8 @@
+Statistics for klein-bottle.txt of size 54
+			Time (ms)	Average (ms)	T/(n^2)		T/(n^3)
+Full Algorithm		4.70E1		8.70E-1		1.61E-2		2.98E-4
+Reading/Sorting		4.20E1		7.78E-1		1.44E-2		2.67E-4
+Sparse Representation	2.00E0		3.70E-2		6.86E-4		1.27E-5
+Reducing Matrix		1.00E0		1.85E-2		3.43E-4		6.35E-6
+Identifying intervals	1.00E0		1.85E-2		3.43E-4		6.35E-6
+Outputing Result	1.00E0		1.85E-2		3.43E-4		6.35E-6

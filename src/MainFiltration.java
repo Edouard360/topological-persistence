@@ -30,23 +30,22 @@ public class MainFiltration {
 		if (args.length != 1) {
 
 			// First uncomment and run this to create the filtrations.
-			//createFiltrations();
+			// createFiltrations();
 
 			// Then go in the GenerateFiltration.java and run the main to
 			// generate the sphere and the ball.
 
 			// Now that generated filtrations are ready, uncomment and run:
-			//printBarcodes(GENERATED_FILTRATIONS,GENERATED_FILTRATIONS_PATH);
+			// printBarcodes(GENERATED_FILTRATIONS,GENERATED_FILTRATIONS_PATH);
 
 			// Now for the provided filtrations (make sure to put them in the
 			// folder corresponding to PROVIDED_FILTRATIONS_PATH), uncomment and
 			// run:
-			//printBarcodes(PROVIDED_FILTRATIONS,PROVIDED_FILTRATIONS_PATH);
+			// printBarcodes(PROVIDED_FILTRATIONS,PROVIDED_FILTRATIONS_PATH);
 			
 			// If you want to test a single filtration, run:
 			// printBarcode("klein-bottle.txt",GENERATED_FILTRATIONS_PATH,null);
 			
-
 			System.exit(0);
 		}
 		System.out.println(readFiltration(args[0]));

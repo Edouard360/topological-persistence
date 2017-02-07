@@ -1,0 +1,8 @@
+Statistics for mobius-strip.txt of size 24
+			Time (ms)	Average (ms)	T/(n^2)		T/(n^3)
+Full Algorithm		5.00E0		2.08E-1		8.68E-3		3.62E-4
+Reading/Sorting		4.00E0		1.67E-1		6.94E-3		2.89E-4
+Sparse Representation	1.00E0		4.17E-2		1.74E-3		7.23E-5
+Reducing Matrix		0.00E0		0.00E0		0.00E0		0.00E0
+Identifying intervals	0.00E0		0.00E0		0.00E0		0.00E0
+Outputing Result	0.00E0		0.00E0		0.00E0		0.00E0

@@ -1,0 +1,8 @@
+Statistics for filtration_A.txt of size 428643
+			Time (ms)	Average (ms)	T/(n^2)		T/(n^3)
+Full Algorithm		1.23E4		2.86E-2		6.68E-8		1.56E-13
+Reading/Sorting		3.01E3		7.02E-3		1.64E-8		3.82E-14
+Sparse Representation	2.39E3		5.59E-3		1.30E-8		3.04E-14
+Reducing Matrix		6.49E3		1.51E-2		3.53E-8		8.24E-14
+Identifying intervals	1.12E2		2.61E-4		6.10E-10	1.42E-15
+Outputing Result	2.66E2		6.21E-4		1.45E-9		3.38E-15
