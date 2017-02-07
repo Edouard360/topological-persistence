@@ -90,13 +90,16 @@ Statistics for runtime are *independently* printed to files `/tests/provided-fil
 Also, in the `/tests/provided-filtrations/result/runtime/all_stats.txt`, we can find the grouped statistics for filtrations A to D.
 We order filtrations by increasing size.
 To get the sparse representation of the matrix, we have:
+
 |Sparse representation|Time (ms)|Average (ms)|T/(n^2)|T/(n^3)|
 |---|:---:|:---:|:---:|:---:|
 |f_B.txt (108161)|4.18E2|3.86E-3|3.57E-8|3.30E-13|
 |f_C.txt (180347)|2.22E3|1.23E-2|6.82E-8|3.78E-13|
 |f_A.txt (428643)|2.49E3|5.81E-3|1.36E-8|3.16E-14|
 |f_D.txt (2716431)|1.32E5|4.85E-2|1.79E-8|6.57E-15|
+
 To perform the reduction operation, we have:
+
 |Reducing Matrix|Time (ms)|Average (ms)|T/(n^2)|T/(n^3)|
 |---|:---:|:---:|:---:|:---:|
 |f_B.txt (108161)|5.64E2|5.21E-3|4.82E-8|4.46E-13|
